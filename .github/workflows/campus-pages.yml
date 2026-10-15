@@ -1,0 +1,46 @@
+name: Campus Resume Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: campus-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Check campus application
+        run: |
+          node --check examples/campus-cn/src/app.js
+          node --test examples/campus-cn/tests/*.test.js
+      - name: Prepare static application
+        run: |
+          mkdir -p _campus_site
+          cp examples/campus-cn/index.html examples/campus-cn/styles.css _campus_site/
+          cp -R examples/campus-cn/src examples/campus-cn/assets examples/campus-cn/vendor examples/campus-cn/docs _campus_site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _campus_site
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
