@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/reactive-resume/reactive-resume",
+  "commit": "19e0518eb5ea1b2c84d785bc5ea2b6d6c9d7b043",
+  "transformation": "node:module stripTypeScriptTypes, mode strip; source comments retained; attribution header added",
+  "license": "MIT",
+  "licenseSha256": "d7839f5fa862720b1501a54bcc0d6a2566b59cee221738640bf1508630f73cc1",
+  "files": [
+    {
+      "source": "packages/schema/src/resume/default.ts",
+      "output": "default.js",
+      "sourceSha256": "df469f9ff6a9fcc2112ca8e370d5b6c2dc210dfc584bcce74a512f889437cc32",
+      "outputSha256": "8503dafb5bd1b664a4f2382ab261246a6a7ade189264e88a7ee8f9ed45bcd185"
+    },
+    {
+      "source": "packages/pdf/src/templates/shared/filtering.ts",
+      "output": "filtering.js",
+      "sourceSha256": "a44e1c21f528893fca7ba49ff60999cb99b65842cf98bcff49f46d4d5e634226",
+      "outputSha256": "43b176107ed13b4497385d39396e9480a06446a939a0b32afcf4d73258e04e8e"
+    }
+  ]
+}
