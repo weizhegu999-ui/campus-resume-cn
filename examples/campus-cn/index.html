@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#315df4" />
+		<meta
+			name="description"
+			content="青简：Reactive Resume 中文校招扩展。用真实经历写好一页简历，支持 STAR 项目编辑、岗位关键词匹配、JSON 交换与打印 PDF。"
+		/>
+		<title>青简 · 中文校招简历工作台</title>
+		<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+		<link rel="stylesheet" href="./styles.css" />
+		<script type="module" src="./src/app.js"></script>
+	</head>
+	<body>
+		<a class="skip-link" href="#editor-title">跳到编辑区</a>
+		<aside class="sidebar no-print">
+			<a class="brand" href="#basics"
+				><span class="brand-mark">青</span><span>青简<small>CAMPUS RESUME</small></span></a
+			>
+			<div class="sidebar-label">我的工作台</div>
+			<div class="document-card">
+				<span class="document-icon">▤</span>
+				<div><strong>我的校招简历</strong><small>中文 · A4 · 本地草稿</small></div>
+				<span class="document-dot"></span>
+			</div>
+			<div class="sidebar-label second">一步一步，写清楚自己</div>
+			<nav aria-label="编辑模块">
+				<button class="nav-item active" data-tab="basics" aria-current="page">
+					<span>01</span>基本信息<span class="nav-arrow">↗</span>
+				</button>
+				<button class="nav-item" data-tab="projects"><span>02</span>项目经历<span class="nav-arrow">↗</span></button>
+				<button class="nav-item" data-tab="match"><span>03</span>岗位匹配<span class="nav-arrow">↗</span></button>
+				<button class="nav-item" data-tab="design"><span>04</span>模板与排版<span class="nav-arrow">↗</span></button>
+			</nav>
+			<div class="sidebar-tools">
+				<button id="import-button">⇥　导入 JSON</button><button id="prompt-button">✧　AI 协作提示词</button
+				><button id="load-demo">◈　载入虚构示例</button><button id="new-draft">＋　新建空白简历</button>
+			</div>
+			<div class="privacy-card">
+				<span class="privacy-icon">◇</span><strong>你的经历，留在你的设备</strong>
+				<p>无需账号。编辑和匹配在本地完成，简历内容不会上传。</p>
+			</div>
+			<a
+				class="upstream-link"
+				href="https://github.com/reactive-resume/reactive-resume"
+				target="_blank"
+				rel="noreferrer"
+				>Reactive Resume 校招扩展 <span>↗</span></a
+			>
+		</aside>
+		<div class="app-shell">
+			<header class="topbar no-print">
+				<div class="breadcrumbs">
+					<span>我的简历</span><i>/</i><strong>校招工作台</strong><span class="beta-tag">BETA 01</span>
+				</div>
+				<div class="header-actions">
+					<span id="save-status" role="status"><i class="save-dot"></i>本地已保存</span
+					><button class="button" id="export-data">导出数据 <span>↓</span></button
+					><button class="button primary" id="print-button">导出 PDF <span>↗</span></button>
+				</div>
+			</header>
+			<div class="workspace">
+				<section class="editor-panel no-print" aria-labelledby="editor-title">
+					<div class="editor-heading">
+						<div class="eyebrow" id="editor-step">STEP 01 / ABOUT YOU</div>
+						<h1 id="editor-title" tabindex="-1">从你自己开始。</h1>
+						<p id="editor-description">把基本信息写准确，让机会找到你。</p>
+					</div>
+					<div id="editor-content"></div>
+					<div class="editor-bottom">
+						<span>真实、具体，胜过堆砌形容词。</span
+						><button id="next-step" class="text-button">下一步：项目经历 →</button>
+					</div>
+				</section>
+				<section class="preview-pane" aria-label="简历实时预览">
+					<div class="preview-toolbar no-print">
+						<div><span class="live-dot"></span><strong>实时预览</strong><span id="template-label">经典单栏</span></div>
+						<div class="preview-controls">
+							<span id="page-status" role="status">A4 · 正在检查</span
+							><button id="fit-page" class="icon-button" aria-label="适应预览宽度">⛶</button>
+						</div>
+					</div>
+					<div class="paper-scroll">
+						<div class="paper-frame" id="paper-frame">
+							<article class="resume-paper template-classic" id="resume-paper" aria-label="简历正文">
+								<div id="resume-content"></div>
+							</article>
+						</div>
+					</div>
+					<div class="preview-footer no-print">
+						<span><i class="live-dot"></i>你的修改会实时同步到这里</span><span>PDF 中的文字可选取</span>
+					</div>
+				</section>
+			</div>
+		</div>
+		<div class="toast no-print" id="toast" role="status" hidden></div>
+		<input type="file" id="import-file" accept=".json,application/json" hidden />
+		<dialog id="import-dialog" class="modal no-print">
+			<div class="modal-heading">
+				<h2>导入简历数据</h2>
+				<button data-close="import-dialog" class="icon-button" aria-label="关闭导入说明">×</button>
+			</div>
+			<p>导入成功后会替换当前草稿。需要保留时，请先导出数据备份。</p>
+			<div id="import-limitations" class="subtle"></div>
+			<button id="choose-import-file" class="button primary full">选择 JSON 文件</button>
+		</dialog>
+		<dialog id="export-dialog" class="modal no-print">
+			<div class="modal-heading">
+				<h2>带走你的简历数据</h2>
+				<button data-close="export-dialog" class="icon-button" aria-label="关闭导出窗口">×</button>
+			</div>
+			<p>校招草稿保留 STAR 字段和排版设置；Reactive Resume JSON 用于与上游交换支持的内容。</p>
+			<button id="download-draft" class="export-choice">
+				<strong>青简草稿 JSON <span>推荐备份</span></strong
+				><small>完整保存当前校招编辑数据</small></button
+			><button id="download-reactive" class="export-choice">
+				<strong>Reactive Resume v6 JSON <span>内容交换</span></strong
+				><small>采用上游默认数据结构；原版样式和模板不会逐像素一致</small>
+			</button>
+			<p class="subtle">导出的文件可能包含个人信息，请自行妥善保管。</p>
+		</dialog>
+		<dialog id="prompt-dialog" class="modal wide no-print">
+			<div class="modal-heading">
+				<h2>AI 协作提示词</h2>
+				<button data-close="prompt-dialog" class="icon-button" aria-label="关闭提示词窗口">×</button>
+			</div>
+			<p>这里生成提示词，没有连接 AI 服务。复制前请检查项目或 JD 中的敏感信息；默认不包含姓名、邮箱和电话。</p>
+			<textarea id="ai-prompt" readonly rows="16" aria-label="可复制的 AI 协作提示词"></textarea>
+			<div class="modal-actions">
+				<button id="download-prompt" class="button">下载文本</button
+				><button id="copy-prompt" class="button primary">复制提示词</button>
+			</div>
+		</dialog>
+		<dialog id="print-dialog" class="modal no-print">
+			<div class="modal-heading">
+				<h2>保存为 PDF</h2>
+				<button data-close="print-dialog" class="icon-button" aria-label="关闭 PDF 提示窗口">×</button>
+			</div>
+			<p>接下来会打开浏览器打印窗口，选择“另存为 PDF”。</p>
+			<ol class="print-tips">
+				<li>纸张选择 <strong>A4</strong>，缩放 <strong>100%</strong>。</li>
+				<li>关闭浏览器的<strong>页眉和页脚</strong>。</li>
+				<li>需要模板色块时，启用<strong>背景图形</strong>。</li>
+			</ol>
+			<p id="print-warning" class="subtle"></p>
+			<button id="confirm-print" class="button primary full">打开打印窗口 ↗</button>
+		</dialog>
+	</body>
+</html>
